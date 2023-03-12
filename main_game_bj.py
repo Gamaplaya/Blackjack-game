@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from random import randint
 import time
 
@@ -88,7 +87,7 @@ def correct_name():
             print("Maximum characters is 20.")
     return name
 
-print("\nHi, and welcome to the blackjack game!\n     ♠ ♥ ♦ ♣ ")                  
+print("\nHi, and welcome to the blackjack game!\n")                  
 name = correct_name()
 print("Good to see you " + name + "!")
 
@@ -187,6 +186,7 @@ def main():
         global account_total
         conf_bet_1 = input("Would you like to place a new bet on deck one? (y/n)\n")
         if conf_bet_1.lower() == "y" and account_total > 0:
+            print("Please place your bet!\n")
             new_bet_input = correct_bet() 
             if new_bet_input == type(str) and new_bet_input == "no" or new_bet_input =="n":
                 pass
@@ -199,14 +199,15 @@ def main():
         else:
             pass
 
-        conf_bet_2 = input("Would you like to place a new bet on deck one? (y/n)\n")
+        conf_bet_2 = input("Would you like to place a new bet on deck two? (y/n)\n")
         if conf_bet_2.lower() == "y" and account_total > 0:
+            print("Please place your bet!\n")
             new_bet_input = correct_bet() 
             if new_bet_input == type(str) and new_bet_input == "no" or new_bet_input =="n":
                 pass
             else:
                 player_bet_1 += new_bet_input
-                print("Your new amount is: €" + str(player_bet))
+                print("Your new amount is: €" + str(player_bet_1))
         elif conf_bet_2.lower() == "y" and account_total <= 0:
             print("\nInsufficient funds\n")
             pass
@@ -226,19 +227,18 @@ def main():
                 else:
                     pass
             if player_card_value > 21:
-                account_total -= player_bet
                 print("\nYou bust. The bank wins!")
-                main()
+                new_card_input = "n"
             elif player_card_value == 21:
                 account_total += player_bet *3
                 print("\nBlackjack! You win {}".format(str(player_bet *3)))
-                main()
+                new_card_input = "n"
             else:
                 new_card_input = input("\nWould you like to pull another card for deck one? (y/n\n")
         else:
             pass
 
-        new_card_input = input("\nWould you like to pull another card for deck one? (y/n\n")
+        new_card_input = input("\nWould you like to pull another card for deck two? (y/n\n")
         while new_card_input.lower() == "y":   
             new_card = pull_card()
             player_cards_1.append(new_card)
@@ -251,13 +251,12 @@ def main():
                 else:
                     pass
             if player_card_value_1 > 21:
-                account_total -= player_bet_1
                 print("\nYou bust. The bank wins!")
-                main()
+                new_card_input = "n"
             elif player_card_value_1 == 21:
                 account_total += player_bet_1 * 3
                 print("\nBlackjack! You win {}".format(str(player_bet_1 *3)))
-                main()
+                new_card_input = "n"
             else:
                 new_card_input = input("\nWould you like to pull another card for deck one? (y/n\n")
         else:
@@ -267,6 +266,7 @@ def main():
         global player_bet, player_bet_1, player_card_value, player_card_value_1, account_total
         bank_cards = []
         bank_score = 0
+        bank_win = False
         print("\nThe bank pulls the following cards:\n")
         for i in range(2):
             bank_card_1 = pull_card()
@@ -275,36 +275,35 @@ def main():
             print("The {num} of {color}".format(num=bank_card_1[1].title(), color=bank_card_1[0].title()))
             if player_card_value_1 > 0:
                 if bank_score > player_card_value_1:
-                    account_total -= player_bet_1
                     player_card_value_1 = 0
                     print("\nThe bank wins deck two! You lost: €{}".format(player_bet_1))
                 elif bank_score > player_card_value:
-                    account_total -= player_bet
                     player_card_value = player_card_value_1
                     player_bet = player_bet_1
                     player_card_value_1 = 0
                     print("\nThe bank wins deck one! You lost: €{}".format(player_bet))
                 elif bank_score > player_card_value and bank_score > player_card_value_1:
-                    account_total -= player_bet + player_bet_1
                     print("\nThe bank wins both decks! You lost: €{}".format(player_bet_1 + player_bet))
                     main()
                 else:
                     pass
             elif bank_score > player_card_value:
-                account_total -= player_bet
                 print("\nThe bank wins! You lost €{}".format(player_bet + player_bet_1))
                 main()
-            elif bank_score <= player_card_value:
+            elif bank_score <= player_card_value and bank_score >= 17:
                 account_total += player_bet *2
-                print("\nCongratulations! You win €{}".format(player_bet + player_bet_1))
+                print("\nCongratulations! You win €{}".format((player_bet *2) + (player_bet_1 *2)))
 
-        while bank_score < 17:
+        while bank_score < 17 and bank_win == False:
             bank_card_add = pull_card()
             bank_cards.append(bank_card_add)
             bank_score += bank_card_add[-1]
             print("\nThe bank pulls:\nThe {num} of {color}".format(num=bank_card_add[1].title(), color=bank_card_add[0].title()))
             for card in bank_cards:
                 if "ace" in card and bank_score > 21:
+                    bank_score -= 10
+                    card.pop(1)
+                elif "ace" in card and bank_score <= 17:
                     bank_score -= 10
                     card.pop(1)
                 else:
@@ -314,16 +313,13 @@ def main():
                     account_total += (player_bet + player_bet_1) *2
                     print("\nThe bank busts! You win: €{}".format((player_bet + player_bet_1) *2))
                 elif bank_score > player_card_value_1 and bank_score > player_card_value:
-                    account_total -= player_bet + player_bet_1
                     print("\nThe bank wins! You lost €{}".format(player_bet + player_bet_1))
                 elif bank_score <= player_card_value_1 and bank_score <= player_card_value:
                     account_total += (player_bet + player_bet_1) *2
                     print("\nYou win! Congratulations. Here is: {}".format((player_bet + player_bet_1) *2))
                 elif bank_score > player_card_value_1:
-                    account_total -= player_bet_1
                     print("\nThe bank wins deck two! You lost: €{}".format(player_bet_1))
                 elif bank_score > player_card_value:
-                    account_total -= player_bet
                     print("\nThe bank wins deck one! You lost: €{}".format(player_bet))
                 elif bank_score > player_card_value and bank_score <= player_card_value_1:
                     account_total += player_bet_1 - player_bet
@@ -337,9 +333,9 @@ def main():
                 account_total += player_bet *2
                 print("\nThe bank busts! You win: €{}".format(player_bet *2))
             elif bank_score > player_card_value:
-                account_total -= player_bet
                 print("\nThe bank wins! You lost €{}".format(player_bet))
-            else:
+                bank_win = True
+            elif bank_score <= player_card_value and bank_score >= 17:
                 account_total += player_bet * 2
                 print("\nYou win! Congratulations. Here is: {}".format(int(player_bet *2)))
         main()
@@ -375,7 +371,7 @@ def main():
         if account_total <= 0:
             bet_new = True
         while bet_new == False:
-            bet_yn = input("\nYou have €" + str(account_total) + "\nWould you like to place a new bet? Your current bet is €" + str(player_bet) + " (y/n)\n")
+            bet_yn = input("\nYou have €" + str(account_total) + "\nWould you like to place a new bet? (y/n)\nYour current bet is €" + str(player_bet) + "\n")
             if bet_yn.lower() == "y" or bet_yn.lower() == "yes":
                 print("\nPlease place your new bet:")
                 bet_new = True
@@ -387,7 +383,9 @@ def main():
                 print("Please enter yes (y) or no (n)")
     else:
         double_deck_play()
-
+    if player_card_value_1 > 21 and player_card_value > 21:
+        print("No more cards to play!")
+        main()
     if player_card_value_1 == 0:
         new_card_input = input("\nWould you like to pull another card? (y/n)\n")
         while new_card_input.lower() == "y":   
@@ -405,6 +403,7 @@ def main():
                 print("\nYou bust. The bank wins!")
                 main()
             elif player_card_value == 21:
+                account_total += player_bet *3
                 print("\nBlackjack! You win {}".format(str(player_bet *3)))
                 main()
             else:
