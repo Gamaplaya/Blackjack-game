@@ -1,0 +1,21 @@
+What do i want this game to do?
+
+i want to initialize a game by giving giving 2 cards
+The players can bet 
+There must be a minimum and maximum bet 
+
+you get the option to split the cards
+if not, then continue, otherwise you get two more cards.
+then we need to keep track of another set of cards
+
+you get the option to add a card to your deck
+if card total > 21, you bust
+you lose the bet
+if exactly 21 then you win with 3 times return on bet
+otherwise continue
+
+the bank draws 2 cards
+must continue pulling cards untill 17 is reached. 
+if 17 or higher is reached, compare the cards to player
+
+all done
